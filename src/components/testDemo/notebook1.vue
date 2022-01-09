@@ -41,6 +41,13 @@
       inactive-text="显示轨迹"
     >
     </el-switch>
+    <el-switch
+      @change="showMarkers"
+      v-model="markersShow"
+      active-text="10万mark"
+      inactive-text="隐藏mark"
+    >
+    </el-switch>
 
     <div id="map"></div>
     <div class="menuBar" :class="{ hide: hideMenu }">
@@ -62,6 +69,7 @@ export default {
   data() {
     return {
       map: '',
+      mapCenter: [40.02404009136253, 116.50641060224784],
       markerType: '',
       mapType: '',
       googleMapUrl:
@@ -76,7 +84,10 @@ export default {
       newLatlngs: [],
       speetX: 1,
       decorator: null,
-      routeLine: null
+      routeLine: null,
+      markersShow: false,
+      ciLayer: null,
+      markerList: []
     }
   },
   mounted() {
@@ -85,7 +96,7 @@ export default {
   methods: {
     initDate() {
       this.map = L.map('map', {
-        center: [40.02404009136253, 116.50641060224784], // 地图中心
+        center: this.mapCenter, // 地图中心
         zoom: 14, // 缩放比列
         zoomControl: false, // 禁用 + - 按钮
         doubleClickZoom: false, // 禁用双击放大
@@ -452,7 +463,37 @@ export default {
     stopClick() {
       this.newLatlngs = []
       this.animatedMarker.stop()
+    },
+    showMarkers() {
+      if (this.markersShow) {
+        this.ciLayer = L.canvasIconLayer({}).addTo(this.map)
+        const icon = L.icon({
+          iconUrl: require('@/assets/pikachu.png'),
+          iconSize: [40, 40],
+          iconAnchor: [10, 9]
+        })
+        for (var i = 0; i < 20000; i++) {
+          var lat = this.mapCenter[0] + (Math.random() - Math.random()) * 3
+          var lng = this.mapCenter[1] + (Math.random() - Math.random()) * 3
+          var marker = L.marker([lat, lng], {
+            icon: icon
+          })
+            .bindPopup('I Am ' + i) // 绑定气泡窗口
+          this.ciLayer.addLayer(marker)
+          this.markerList.push(marker)
+        }
+      } else {
+        // console.log(this.ciLayer)
+        // this.markerList.forEach((marker) => {
+        //   this.ciLayer.removeLayer(marker)
+        // })
+        this.ciLayer.remove()
+        // this.ciLayer = null
+        // this.map.removeLayer(this.ciLayer)
+        // console.log(this.map)
+      }
     }
+
   }
 }
 </script>
@@ -468,7 +509,7 @@ export default {
     width: 600px;
     position: fixed;
     text-align: center;
-    top: 50px;
+    top: 80px;
     left: 50px;
     padding: 5px;
     border-radius: 3px;

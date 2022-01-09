@@ -16,6 +16,8 @@ import 'leaflet.pm/dist/leaflet.pm.css'
 
 import 'leaflet.chinatmsproviders'
 import 'leaflet.markercluster'
+// import 'leaflet-canvas-marker'
+import '../leaflet.canvas-markers'
 
 // import '../static/leaflet-gcj02'
 import 'proj4leaflet'
