@@ -48,6 +48,13 @@
       inactive-text="隐藏mark"
     >
     </el-switch>
+    <el-switch
+      @change="showClusterMarkers"
+      v-model="clusterMarkersShow"
+      active-text="聚合mark"
+      inactive-text="隐藏mark"
+    >
+    </el-switch>
 
     <div id="map"></div>
     <div class="menuBar" :class="{ hide: hideMenu }">
@@ -87,7 +94,10 @@ export default {
       routeLine: null,
       markersShow: false,
       ciLayer: null,
-      markerList: []
+      markerList: [],
+      clusterMarkersShow: false,
+      clusterLayer: null,
+      clusterMarkerList: []
     }
   },
   mounted() {
@@ -472,6 +482,7 @@ export default {
           iconSize: [40, 40],
           iconAnchor: [10, 9]
         })
+        const start = new Date()
         for (var i = 0; i < 20000; i++) {
           var lat = this.mapCenter[0] + (Math.random() - Math.random()) * 3
           var lng = this.mapCenter[1] + (Math.random() - Math.random()) * 3
@@ -482,15 +493,36 @@ export default {
           this.ciLayer.addLayer(marker)
           this.markerList.push(marker)
         }
+        const end = new Date()
+        console.log('耗时：' + (end - start) + 'ms')
       } else {
-        // console.log(this.ciLayer)
-        // this.markerList.forEach((marker) => {
-        //   this.ciLayer.removeLayer(marker)
-        // })
         this.ciLayer.remove()
-        // this.ciLayer = null
-        // this.map.removeLayer(this.ciLayer)
-        // console.log(this.map)
+      }
+    },
+    showClusterMarkers() {
+      if (this.clusterMarkersShow) {
+        this.clusterLayer = L.markerClusterGroup()
+        const icon = L.icon({
+          iconUrl: require('@/assets/pikachu.png'),
+          iconSize: [40, 40],
+          iconAnchor: [10, 9]
+        })
+        for (var i = 0; i < 20000; i++) {
+          var lat = this.mapCenter[0] + (Math.random() - Math.random()) * 3
+          var lng = this.mapCenter[1] + (Math.random() - Math.random()) * 3
+          var marker = L.marker([lat, lng])
+            .bindPopup('I Am ' + i) // 绑定气泡窗口
+          this.clusterMarkerList.push(marker)
+        }
+        const start = new Date()
+        this.clusterLayer.clearLayers()
+        this.clusterLayer.addLayers(this.clusterMarkerList)
+        const end = new Date()
+        console.log('耗时：' + (end - start) + 'ms')
+        this.clusterLayer.addTo(this.map)
+      } else {
+        this.clusterMarkerList = []
+        this.clusterLayer.remove()
       }
     }
 

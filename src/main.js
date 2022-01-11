@@ -15,6 +15,8 @@ import 'leaflet-polylinedecorator'
 import 'leaflet.pm/dist/leaflet.pm.css'
 
 import 'leaflet.chinatmsproviders'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import 'leaflet.markercluster'
 // import 'leaflet-canvas-marker'
 import '../leaflet.canvas-markers'
