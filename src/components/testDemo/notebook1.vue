@@ -510,7 +510,7 @@ export default {
         for (var i = 0; i < 20000; i++) {
           var lat = this.mapCenter[0] + (Math.random() - Math.random()) * 3
           var lng = this.mapCenter[1] + (Math.random() - Math.random()) * 3
-          var marker = L.marker([lat, lng])
+          var marker = L.marker([lat, lng], {icon})
             .bindPopup('I Am ' + i) // 绑定气泡窗口
           this.clusterMarkerList.push(marker)
         }
