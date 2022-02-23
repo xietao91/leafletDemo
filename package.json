@@ -31,7 +31,7 @@
     "leaflet-minimap": "^3.6.1",
     "leaflet-polylinedecorator": "^1.6.0",
     "leaflet.animatedmarker": "^1.0.0",
-    "leaflet.chinatmsproviders": "^3.0.2",
+    "leaflet.chinatmsproviders": "^3.0.4",
     "leaflet.markercluster": "^1.4.1",
     "leaflet.pm": "^2.2.0",
     "less": "^3.11.1",

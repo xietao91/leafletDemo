@@ -26,6 +26,7 @@
     >
       <el-option label="谷歌" value="google"></el-option>
       <el-option label="osm" value="osm"></el-option>
+      <el-option label="天地图" value="tianditu"></el-option>
     </el-select>
     <el-switch
       v-model="showHeatMap"
@@ -82,6 +83,7 @@ export default {
       googleMapUrl:
         'http://mt1.google.cn/vt/lyrs=y@160000000&hl=zh-CN&gl=CN&src=app&y={y}&x={x}&z={z}&s=Ga',
       osmMapUrl: 'http://tile.osm.org/{z}/{x}/{y}.png',
+      tiandituMapUrl: 'https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=c73c763109367bf6dc24635cfb567b09',
       tileLayer: null,
       showHeatMap: false,
       heatmapLayer: null,
@@ -97,26 +99,44 @@ export default {
       markerList: [],
       clusterMarkersShow: false,
       clusterLayer: null,
-      clusterMarkerList: []
+      clusterMarkerList: [],
+      mapKey: 'c73c763109367bf6dc24635cfb567b09'
     }
   },
   mounted() {
-    this.initDate()
+    this.initMap()
   },
   methods: {
-    initDate() {
+    initMap() {
+      // this.tileLayer = L.tileLayer(this.googleMapUrl)
+      // this.tileLayer.addTo(this.map)
+      //   name.remove(this.map)
+      //   this.map.removeLayer(name)
+      // 定义地图图层，官方api有
+      const norMap = this.loadMapConfig('Normal.Map')
+      const norAnnotion = this.loadMapConfig('Normal.Annotion')
+      const sateMap = this.loadMapConfig('Satellite.Map')
+      const sateAnnotion = this.loadMapConfig('Satellite.Annotion')
+      const terMap = this.loadMapConfig('Terrain.Map')
+      const terAnnotion = this.loadMapConfig('Terrain.Annotion')
+      const normalMap = L.layerGroup([norMap, norAnnotion]) // 矢量
+      const satelliteMap = L.layerGroup([sateMap, sateAnnotion]) // 卫星
+      const terrainMap = L.layerGroup([terMap, terAnnotion]) // 地形
+      const baseLayers = {
+        'Normal': normalMap,
+        'Satellite': satelliteMap,
+        'Terrain': terrainMap
+      }
       this.map = L.map('map', {
         center: this.mapCenter, // 地图中心
         zoom: 14, // 缩放比列
         zoomControl: false, // 禁用 + - 按钮
         doubleClickZoom: false, // 禁用双击放大
         attributionControl: false, // 移除右下角leaflet标识
-        preferCanvas: true // 强制使用canvas渲染
+        preferCanvas: true, // 强制使用canvas渲染
+        layers: [normalMap]
       })
-      this.tileLayer = L.tileLayer(this.googleMapUrl)
-      this.tileLayer.addTo(this.map)
-      //   name.remove(this.map)
-      //   this.map.removeLayer(name)
+      L.control.layers(baseLayers, null).addTo(this.map)
       this.map.pm.addControls({
         position: 'topleft',
         drawPolygon: true, // 添加绘制多边形
@@ -138,6 +158,13 @@ export default {
       })
       this.map.pm.setLang('zh') // 设置语言  en, de, it, ru, ro, es, fr, pt_br, zh , nl
       this.getlatLngs()
+    },
+    loadMapConfig(value) {
+      return L.tileLayer.chinaProvider(`TianDiTu.${value}`, {
+        maxZoom: 13,
+        minZoom: 5,
+        key: this.mapKey
+      })
     },
 
     // 绘制
@@ -311,6 +338,10 @@ export default {
 
       if (this.mapType === 'osm') {
         this.tileLayer.setUrl(this.osmMapUrl)
+      }
+
+      if (this.mapType === 'tianditu') {
+        this.tileLayer.setUrl(this.tiandituMapUrl)
       }
     },
     addHeatMap() {
